@@ -1,0 +1,1575 @@
+<!DOCTYPE html> 
+<meta charset = "utf-8">
+<style>
+	#rectangle1, #rectangle2, #rectangle3{
+		border: solid 1px black;
+	}
+
+	div.tooltip {	
+    	position: absolute;			
+        text-align: center;			
+    	width: 100px;					
+    	height: 53px;					
+    	padding: 2px;				
+    	font: 12px sans-serif;		
+    	background: lightsteelblue;	
+    	border: 0px;		
+    	border-radius: 8px;			
+    	pointer-events: none;			
+	}	
+</style>
+<body>
+
+
+
+<!-- area1 for top three rectangles, selecting suspicious & non-suspicious nodes and time period for Zoomed Line chart-->
+<div  id = "area1">
+	
+	<!--Suspicious ID radio button-->
+
+	<div id = "rectangle1" style = "width:250px; height:200px; display: inline-block; vertical-align: top;">
+		<h2 align = "center"> <span style = "font-size: 20px;">Suspicious Purchase Buyer ID</span> </h2>
+		<input type = "radio" name = "select" id = "1847246" value = "1847246_first"> 1847246
+		<input type = "radio" name = "select" id = "695013" value = "695013_first"> 695013<br>
+		<input type = "radio" name = "select" id = "580766" value = "580766_first"> 580766_Fst
+		<input type = "radio" name = "select" id = "580766" value = "580766_Second"> 580766_Snd<br>
+		<input type = "radio" name = "select" id = "437025" value = "437025_first"> 437025_Fst
+		<input type = "radio" name = "select" id = "437025" value = "437025_second"> 437025_Snd<br>
+		<input type = "radio" name = "select" id = "720233" value = "720233_first"> 720233_Fst
+		<input type = "radio" name = "select" id = "720233" value = "720233_second"> 720233_Snd<br>
+		&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<input type = "button" onclick = "suspiciousZoomedLineChart()" value = "Submit" id = "Sus">&nbsp;&nbsp;
+		
+	</div>
+
+	<div id = "piechart1" style = "width: 250px; height: 200px; display: inline-block; vertical-align: top; border: solid 1px black; margin-bottom: 5px">
+		<h2 style = "padding-left: 20px;"> 15 Suspicious Perosns Detected By HMM</h2>
+		<div id = "dropDownBoxThree" style = "width:80px; height:30px; position: absolute; padding-left: 120px;top: 122px;display: inline-block;"> </div>
+			
+
+	</div>
+
+	<!-- Non-Suspicious ID dropdown box-->
+	<div id = "rectangle2" style = "width:250px; height:200px; display: inline-block; vertical-align: top;">
+		
+		<h2 style = "padding-left: 20px;"> Normal Purchase ID</h2>
+		<div id = "dropDownBoxOne" style = "width:80px; height:30px; position: absolute; padding-left: 120px;top: 122px;display: inline-block;"> </div>
+	</div>
+
+
+	<div id = "rectangle2" style = "width:250px; height:200px; display: inline-block; vertical-align: top;">
+		<h2 style = "padding-left: 20px;"> Potential Suspicious Purchase IDs</h2>
+		<div id = "dropDownBoxTwo" style = "width:80px; height:30px; position: absolute; padding-left: 120px;top: 122px;display: inline-block;"> </div>
+		
+	</div>
+
+
+	<!--Potential Suspicious ID-->
+	<div id = "long-rectangle2" style = "width: 380px; height: 200px; display: inline-block; vertical-align: top;
+		border: solid 1px black; background-color: red;">
+		
+		<h3 align = "center" style = "font-size: 20px;"> Select Time Period & Communication Type </h3>
+		Date: <input type = "text" id = "startDate" placeholder = "Ex: 1990-12-31">
+		-&nbsp;<input type = "text" id = "endDate" placeholder = "Ex: 1991-12-31"><br><br>
+		
+		
+		<input type = "checkbox" name = "selectType" id = "0" value = "0"> call
+		<input type = "checkbox" name = "selectType" id = "1" value = "1"> email
+		<input type = "checkbox" name = "selectType" id = "2" value = "2"> meeting
+		<input type = "checkbox" name = "selectType" id = "3" value = "3"> purchase<br><br>
+		<input type = "checkbox" name = "allType" id = "allType" value = "allType"> All 
+		Type<br>
+		<input type = "checkbox" id = "allDate" value = "allDate"> All Date <br>
+		
+		&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<input type = "button" onclick = "ForNetworkGraph()" value = "Submit">&nbsp;&nbsp;<input type = "button" onclick = "resetForNetworkGraph()" value = "reset">
+	</div>
+</div>
+
+<!--Zoomed Line Chart -->
+<div id = "area2">
+	<div id = "long-rectangle1" style = "width: 1000px; height: 700px; display: inline-block; vertical-align: top; border: solid 1px black; margin-top: 2px;">
+		<div id = "tooltips"> </div>
+	</div>
+
+	<div id = "networkGraph" style = "width: 400px; height: 340px; display: inline-block; vertical-align: top; border: solid 1px black; margin-top: 1px;  position: absolute; right: 24px; top: 216px;">	
+	</div>
+
+	<div id = "linechart" style = "width: 400px; height: 350px; display: inline-block; vertical-align: top; border: solid 1px black; position: absolute; right: 24px; top: 567px;">
+	</div>
+
+</div>
+
+<div id = "area31">
+	<div id = "area3" style = "width: 400px; height: 350px; display: inline-block; vertical-align: top; border: solid 1px black; ">
+	</div>
+	<div id = "linechart2" style = "width: 500px; height: 350px; display: inline-block; vertical-align: top; border: solid 1px black;  ">
+	</div>
+</div>
+
+<script src = "//d3js.org/d3.v5.min.js"></script>
+<script type = "text/javascript">
+
+var array = ["668620", "688974", "703151", "703762", "706072", "706483", "707614", "707719",
+				"708241", "719810", "721332", "723614", "726033", "726693", "744840", "758683", "816017",
+				"580766", "437025", "695013", "720233", "1847246"];
+var arrayAndtime = [{id: "668620", seller: "2037802" ,time: 67223719},{id: "688974",seller: "2038128" ,time: 26839258},{id: "703151",seller: "2037780" ,time: 4882078}, {id: "703762",seller: "2037885" ,time: 22172787}, {id:"706072",seller: "2037761" ,time: 2906087}, {id: "706483",seller: "2038053" ,time: 4018976}, {id: "707614", seller: "2038086" ,time: 36766126}, {id: "707719", seller: "2037691",time: 35649036}, {id: "708241",seller: "2038024" ,time: 60550899}, {id: "719810",seller: "2038034" ,time: 804068}, {id: "721332",seller: "2038070" ,time: 21627497},  {id: "723614",seller: "2037981" ,time: 4814769}, {id: "726033",seller: "2037818" ,time: 64687561}, {id: "726693", seller: "2037746",time: 65080143}, {id: "744840",seller: "2038117" ,time: 59212056}, {id: "758683",seller: "2037861" ,time: 70984262}, {id: "816017", seller: "2037735" ,time: 65310056}, {id: "580766_first", seller: "2038138" ,time: 53206509}, {id:"580766_second", seller: "2038138" ,time: "69572943"}, {id: "437025_first", seller: "2037766" ,time: 65109062}, {id: "437025_second", seller: "2037766", time: 81692792}, {id: 
+"695013_first", seller: "2037860" ,time: 66679529}, {id: "720233_first", seller: "2038031" ,time: 78658500}, {id: "720233_second", seller: "2038031",time: 81994361}, {id: "1847246_first",seller: "2038003" ,time: 74565933}, {id: "712864", seller: "2040565", time: 80907455}, {id: "712902", seller: "2040565", time: 76560932}, {id: "712908", seller: "2040565", time: 7157798}, {id: "725281", seller: "2040565", time: 1257156}, {id: "725387", seller: "2040565", time: 80757412}, {id: "747489", seller: "2040565", time: 57533066}];
+
+//Data For DropDown Box
+var dataForDB = ["703151", "703762", "706072", "706483", "707614", "707719", "708241", "719810", "721332", "723614", "726033", "726693", "744840", "712864", "712902", "712908", "725281", "725387", "747489"];
+var dropdownForNormal = d3.select("#dropDownBoxOne");
+dropdownForNormal.append("select").selectAll("option").data(dataForDB).enter().append("option").attr("value",function(d){return d;}).text(function(d){return d;});
+dropdownForNormal.on("change", changed);
+
+var dataForDB2 = ["668620", "816017", "758683"];
+var dropdownForPotential = d3.select("#dropDownBoxTwo");
+dropdownForPotential.append("select").selectAll("option").data(dataForDB2).enter().append("option").attr("value", function(d){return d;}).text(function(d){return d;});
+dropdownForPotential.on("change", changed);
+
+var dataForDB3 = ["698599", "705082", "706047", "706333", "707840", "710549", "711990", "714896", "715811", "716132", "716620", "719257", "725242", "725450", "727399"];
+var dropdownForFiftenPerson = d3.select("#dropDownBoxThree");
+dropdownForFiftenPerson.append("select").selectAll("option").data(dataForDB3).enter().append("option").attr("value", function(d){
+	return d;}).text(function(d){return d;});
+dropdownForFiftenPerson.on("change", changedTwo);
+
+
+var value;
+function changed(){
+	d3.select("#long-rectangle1").select("svg").remove();
+	d3.select("#networkGraph").select("svg").remove();
+	d3.select("#linechart").select("svg").remove();
+	d3.select("#linechart2").select("svg").remove();
+	d3.select("#area3").select("svg").remove();
+	value = d3.select(this).select("select").property("value");
+	var fileName = "TwoMonthCommunication/" + value + "TwoMonthCommunication.csv";
+	console.log(fileName);
+	createZoomedLineChart(fileName);
+}
+
+
+function changedTwo(){
+	d3.select("#long-rectangle1").select("svg").remove();
+	d3.select("#networkGraph").select("svg").remove();
+	d3.select("#linechart").select("svg").remove();
+	d3.select("#linechart2").select("svg").remove();
+	d3.select("#area3").select("svg").remove();
+	value = d3.select(this).select("select").property("value");
+	var fileName = "15Communications/" + value + "TwoMonthCommunication.csv";
+	console.log(fileName);
+	createZoomedLineChart(fileName);
+}
+
+//Appending Text in Rectangle 2
+var svgForRect2 = d3.select("#rectangle2").append("svg").attr("width", 250).attr("height", 200);
+var gForRect2 = svgForRect2.append("g").attr("transform", "translate(5,5)");
+//gForRect2.append("text").attr("class", "text").attr("x", 5).attr("y", 30).attr("font-size", 20).attr("font-weight", "bold").text("Normal Purchase ID");
+
+//gForRect2.append("text").attr("class", "text").attr("x", 5).attr("y", 120).attr("font-size", 20).attr("font-weight", "bold").text("Potential Sus-purchase ID");
+
+
+
+function suspiciousZoomedLineChart(){
+	//var value;
+	d3.select("#long-rectangle1").select("svg").remove();
+	d3.select("#networkGraph").select("svg").remove();
+	d3.select("#linechart").select("svg").remove();
+	d3.select("#linechart2").select("svg").remove();
+	d3.select("#area3").select("svg").remove();
+	var select = document.getElementsByName('select');
+	for(var i = 0; i < select.length; i++){
+		if(select[i].checked){
+			value = select[i].value;
+		}
+	}
+
+	var fileName = "" + value + "purchaseTwoMonthWithDate.csv";
+	console.log(fileName);
+	createZoomedLineChart(fileName);
+}
+
+var colors = ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f", "#e5c494", "#9C6EB2", "#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6" ,"#3413c6","#ffff99", "#b15928", "#8dd3c7", "#ffffb3", "#bebada", "#fb8072" ,"#80b1d3", "#fdb462", "#b3de69", "#fccde5","#4B2727" ,"#bc80bd", "#ccebc5", "#ffed6f"];
+
+
+
+// Zoomed Line Chart 
+var div = d3.select("#long-rectangle1").append("div").attr("class", "tooltip").style("opacity", 0);
+function createZoomedLineChart(fileName){
+	var margin = {top: 30, right: 90, left: 50, bottom: 170};
+	var margin2 = {top: 570, right: 90, left: 50, bottom: 30};
+	var width = 1000;
+	var height = 700;
+	var innerwidth = width - margin.left - margin.right;
+	var innerheight = height - margin.top - margin.bottom;
+	var innerheight2 = height - margin2.top - margin2.bottom;
+	var svg = d3.select("#long-rectangle1").append("svg").attr("width", width).attr("height", height);
+	var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
+	
+	var color = d3.scaleOrdinal();
+	var padding = 20;
+	var xScale = d3.scaleTime().range([padding, innerwidth - padding]);
+	var xScale2 = d3.scaleTime().range([padding, innerwidth - padding]);
+	var yScale = d3.scaleBand().rangeRound([innerheight- padding , padding]);
+	var yScale2 = d3.scaleBand().range([innerheight2- padding , padding]);
+	var xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat("%m/%d/%y"));
+	var xAxis2 = d3.axisBottom(xScale2).tickFormat(d3.timeFormat("%m/%d/%y"));
+	var yAxis = d3.axisLeft(yScale);
+	
+	var brush = d3.brushX().extent([[-20, 0], [innerwidth+20, innerheight2]]).on("brush end", brushed);
+
+	var line = d3.line().x(function(d){return xScale(d.date);}).y(function(d){return yScale(d.id) + yScale.bandwidth()/2});
+	var line2 = d3.line().x(function(d){return xScale2(d.date);}).y(function(d){return yScale2(d.id) + yScale2.bandwidth()/2});
+
+	svg.append("defs").append("clipPath").attr("id", "clip").append("rect").attr("width", innerwidth).attr("height", innerheight);
+
+	var focus = svg.append("g").attr("class", "focus").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	var context = svg.append("g").attr("class", "context").attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+	d3.csv(fileName).then(function(d){
+		var data = [];
+		for(var i = 0; i < d.length; i++){
+				data[i] = {source: d[i].source, etype: d[i].etype, target: d[i].target, date: parseDate(d[i].date)}
+		}
+
+		xScale.domain(d3.extent(data, function(d){return d.date;}));
+		//For Colors
+		var uniqueNodes = [];
+		for(var s = 0; s < data.length; s++){
+			var find = false;
+			var index = 0;
+			while(!find && index < uniqueNodes.length){
+				if(uniqueNodes[index] === data[s].source){
+					find = true;
+				}
+				else{
+					index++;
+				}
+			}
+			if(!find){
+				uniqueNodes.push(data[s].source);
+			}
+		}
+		for(var a = 0; a < data.length; a++){
+			var find2 = false;
+			var index2 = 0;
+			while(!find2 && index2 < uniqueNodes.length){
+				if(uniqueNodes[index2] === data[a].target){
+					find2 = true;
+				}
+				else{
+					index2++;
+				}
+			}
+			if(!find2){
+				uniqueNodes.push(data[a].target);
+			}
+		}
+
+		//Using unique nodes to find sequence communication.
+		
+		var countCommunicationTimesOfEachNode = [];
+		for(var w = 0; w < uniqueNodes.length; w++){
+			countCommunicationTimesOfEachNode[w] = 0;
+		}
+		
+
+		for(var q = 0; q < data.length; q++){
+
+			var indexOne = uniqueNodes.indexOf(data[q].source);
+			var indexTwo = uniqueNodes.indexOf(data[q].target);
+
+			countCommunicationTimesOfEachNode[indexOne] = countCommunicationTimesOfEachNode[indexOne] + 1;
+			countCommunicationTimesOfEachNode[indexTwo] = countCommunicationTimesOfEachNode[indexTwo] + 1;
+		}
+
+		
+
+		var uniqueNodesWithColor = [];
+		var indexColor = 0;
+		for(var e = 0; e < uniqueNodes.length; e++){
+			if(countCommunicationTimesOfEachNode[e] >= 2){
+				if(indexColor >= 32){
+					uniqueNodesWithColor.push({id: uniqueNodes[e], color: colors[indexColor - 32]});
+					
+				}
+				else{
+					uniqueNodesWithColor.push({id: uniqueNodes[e], color: colors[indexColor]});
+					
+				}
+				indexColor++;
+				
+			}
+			else{
+				uniqueNodesWithColor.push({id: uniqueNodes[e], color: "#f2f2f2"});
+			}
+		}
+
+
+
+
+
+
+		//Find host node
+		var max = countCommunicationTimesOfEachNode[0];
+		var host = uniqueNodes[0];
+		for(var p = 1; p < countCommunicationTimesOfEachNode.length; p++){
+			if(countCommunicationTimesOfEachNode[p] > max){
+				host = uniqueNodes[p];
+				max = countCommunicationTimesOfEachNode[p];
+			}
+		}
+
+		var idAndTimesOfCommunication = [];
+		for(var d = 0; d < uniqueNodes.length; d++){
+			idAndTimesOfCommunication.push({id: uniqueNodes[d], times: countCommunicationTimesOfEachNode[d]});
+		}
+
+
+		//Get sequence communucation dates;
+		var dateWithSequenceCommunication = [];
+		for(var z = 0; z < data.length; z++){
+
+			var find = false;
+			var index = 0;
+			while(!find && index < idAndTimesOfCommunication.length){
+				if(data[z].source == host){
+					if(data[z].target == idAndTimesOfCommunication[index].id){
+						find = true;
+						if(idAndTimesOfCommunication[index].times >= 2){
+							dateWithSequenceCommunication.push(data[z].date);
+						}
+					}
+					else{
+						index++;
+					}
+				}
+				else{
+					if(data[z].source == idAndTimesOfCommunication[index].id){
+						find = true;
+						if(idAndTimesOfCommunication[index].times >= 2){
+							dateWithSequenceCommunication.push(data[z].date);
+						}
+					}
+					else{
+						index++;
+					}
+				}
+			}
+		}
+
+		console.log(data.length);
+		
+		
+		if(data.length >= 500){
+			for (var i = 0; i < uniqueNodes.length; i++){
+				for(var j = 0; j < data.length; j++){
+					if(data[j].source === uniqueNodes[i] || data[j].target === uniqueNodes[i]){
+						if(uniqueNodesWithColor[i].color === "#f2f2f2"){
+							data.splice(j, 1);
+						}
+					}
+				}
+			}
+		}
+		else if (data.length < 500 && data.length >= 20){
+			for (var i = 0; i < uniqueNodes.length; i++){
+				for(var j = 0; j < data.length; j =j+2){
+					if(data[j].source === uniqueNodes[i] || data[j].target === uniqueNodes[i]){
+						if(uniqueNodesWithColor[i].color === "#f2f2f2"){
+							data.splice(j, 1);
+						}
+					}
+				}
+			}
+		}
+
+		console.log(data.length);
+
+
+
+		//Second Unique Nodes
+
+		var uniqueNodesTwo = [];
+		for(var s = 0; s < data.length; s++){
+			var find = false;
+			var index = 0;
+			while(!find && index < uniqueNodesTwo.length){
+				if(uniqueNodesTwo[index] === data[s].source){
+					find = true;
+				}
+				else{
+					index++;
+				}
+			}
+			if(!find){
+				uniqueNodesTwo.push(data[s].source);
+			}
+		}
+		for(var a = 0; a < data.length; a++){
+			var find2 = false;
+			var index2 = 0;
+			while(!find2 && index2 < uniqueNodesTwo.length){
+				if(uniqueNodesTwo[index2] === data[a].target){
+					find2 = true;
+				}
+				else{
+					index2++;
+				}
+			}
+			if(!find2){
+				uniqueNodesTwo.push(data[a].target);
+			}
+		}
+
+
+		yScale.domain(uniqueNodesTwo);
+		xScale2.domain(xScale.domain());
+		yScale2.domain(yScale.domain());
+
+
+		//For Line && Nodes
+		var links = [];
+		var nodes = [];
+  		for(var q = 0; q < data.length; q++){
+  			var connection;
+  			if(host == data[q].source){
+  				connection = data[q].target;
+  			}
+  			else{
+  				connection = data[q].source;
+  			}
+  			links.push({id: q, value: [{id: data[q].source, date: data[q].date},{id: data[q].target, date: data[q].date}], etype: data[q].etype, connection: connection});
+  			nodes.push({id: data[q].source, date: data[q].date, etype: data[q].etype});
+  			nodes.push({id: data[q].target, date: data[q].date, etype: data[q].etype});
+  		}
+
+  		
+
+  		//Focus --> Link & Node
+  		var focuslineGroups = focus.selectAll("path").data(links).enter().append("g");
+    	var focuslines = focuslineGroups.append("path").attr("class","line").attr("d", function(d) { return line(d.value);}).attr("id", function(d){return d.connection;}).style("stroke", function(d) {
+    			var finalColor = "#ffffff";
+    			if(d.etype == 2){
+    				finalColor = transfer(d.etype);
+    				
+    			}
+    			else{
+    				var color = getColor(d.connection, uniqueNodesWithColor);
+    				
+
+    				if(color == "#f2f2f2"){
+						finalColor = "#f2f2f2";
+						}
+    				else{
+    					finalColor = transfer(d.etype);
+    					
+    				}
+    			}
+
+    			return finalColor;
+		}).attr("clip-path", "url(#clip)");
+    	
+
+    	var dotsFocus = focus.append("g");
+    		dotsFocus.attr("clip-path", "url(#clip)");
+    		dotsFocus.selectAll("circle").data(nodes).enter().append("circle").attr('class', 'dot').attr("id", function(d){return d.id + "-" + d.date + "-" + d.etype;}).attr("r",7.5).style("opacity", .5).attr("cx", function(d) { return xScale(d.date); }).attr("cy", function(d){return (yScale(d.id) + yScale.bandwidth()/2);}).style("fill", 
+    			function(d){
+    				if(d.etype ==2){
+    					return getColor(d.id, uniqueNodesWithColor);
+    				}
+
+    				var find = false;
+    				var index = 0;
+    				while(!find && index < dateWithSequenceCommunication.length){
+    					if(d.date === dateWithSequenceCommunication[index]){
+    						find = true;
+    					}
+    					else{
+    						index++;
+    					}
+    				}
+
+    				if(find){
+    					return getColor(d.id, uniqueNodesWithColor);
+    				}
+    				else{
+    					return "#f2f2f2";
+    				}
+
+    				})
+    		.on("mouseover", mouseover).on("mouseout", mouseout).on("click", function(d){
+
+					d3.select("#area3").select("svg").remove();
+    				var id = d3.select(this).attr("id");
+					//d3.select(this).attr("r", 15);
+					//d3.select(this).transition().duration(1000).attr("r", 10);
+					var name = ((id + "").split("-"))[0];
+					
+		d3.csv("secondLayer/" + name + ".csv").then(function(d){
+						var dataT = [];
+						for(i = 0; i < d.length; i++){
+							dataT.push({source: d[i].source, target: d[i].target, time: d[i].time, date: d[i].date, etype: d[i].etype});
+						}
+
+
+		
+		var nodesForIndex = [];
+		if(nodesForIndex.length == 0){
+			nodesForIndex.push(dataT[0].source);
+			nodesForIndex.push(dataT[0].target);
+		}
+		
+		for(var i = 1; i < dataT.length; i++){
+			var index = 0;
+			var find = false;
+			while(!find && index < nodesForIndex.length){
+				if(nodesForIndex[index] == dataT[i].source){
+					find = true;
+				}
+				else{
+					index++;
+				}
+			}
+
+			if(!find){
+				nodesForIndex.push(dataT[i].source);
+			}
+
+
+			var index2 = 0;
+			var find2 = 0;
+			while(!find2 && index2 < nodesForIndex.length){
+				if(nodesForIndex[index2] == dataT[i].target){
+					find2 = true;
+				}
+				else{
+					index2++;
+				}
+			}
+
+			if(!find2){
+				nodesForIndex.push(dataT[i].target);
+			}
+		}
+		var uniqueNodes = nodesForIndex;
+		//Using unique nodes to find sequence communication.
+		//console.log(uniqueNodes);
+		var countCommunicationTimesOfEachNode = [];
+		for(w = 0; w < uniqueNodes.length; w++){
+			countCommunicationTimesOfEachNode[w] = 0;
+		}
+		//console.log(countCommunicationTimesOfEachNode);
+
+		for(q = 0; q < data.length; q++){
+
+			var indexOne = uniqueNodes.indexOf(data[q].source);
+			var indexTwo = uniqueNodes.indexOf(data[q].target);
+
+			countCommunicationTimesOfEachNode[indexOne] = countCommunicationTimesOfEachNode[indexOne] + 1;
+			countCommunicationTimesOfEachNode[indexTwo] = countCommunicationTimesOfEachNode[indexTwo] + 1;
+		}
+
+
+		var uniqueNodesWithColor = [];
+		var indexColor = 0;
+		for(e = 0; e < uniqueNodes.length; e++){
+			if(countCommunicationTimesOfEachNode[e] >= 2){
+				if(indexColor >= 32){
+					uniqueNodesWithColor.push({id: uniqueNodes[e], color: colors[indexColor - 32]});
+				}
+				else{
+					uniqueNodesWithColor.push({id: uniqueNodes[e], color: colors[indexColor]});
+				}
+				
+				indexColor++;
+			}
+			else{
+				uniqueNodesWithColor.push({id: uniqueNodes[e], color: "#808080"});
+			}
+		}
+
+
+
+
+		for (var i = 0; i < uniqueNodes.length; i++){
+			for(var j = 0; j < dataT.length; j++){
+				if(dataT[j].source === uniqueNodes[i] || dataT[j].target === uniqueNodes[i]){
+					if(uniqueNodesWithColor[i].color === "#808080"){
+						dataT.splice(j, 1);
+					}
+				}
+			}
+		}
+
+		var nodesForIndexTwo = [];
+
+
+		if(nodesForIndexTwo.length == 0){
+			nodesForIndexTwo.push(dataT[0].source);
+			nodesForIndexTwo.push(dataT[0].target);
+		}
+		
+		for(var i = 1; i < dataT.length; i++){
+			var index = 0;
+			var find = false;
+			while(!find && index < nodesForIndexTwo.length){
+				if(nodesForIndexTwo[index] == dataT[i].source){
+					find = true;
+				}
+				else{
+					index++;
+				}
+			}
+
+			if(!find){
+				nodesForIndexTwo.push(dataT[i].source);
+			}
+
+
+			var index2 = 0;
+			var find2 = 0;
+			while(!find2 && index2 < nodesForIndexTwo.length){
+				if(nodesForIndexTwo[index2] == dataT[i].target){
+					find2 = true;
+				}
+				else{
+					index2++;
+				}
+			}
+
+			if(!find2){
+				nodesForIndexTwo.push(dataT[i].target);
+			}
+		}
+
+
+
+		//Caculate Weight
+		
+		var weightedNodes = [];
+		var nodes = [];
+		var edges = [];
+		var svg = d3.select("#area3").append("svg").attr("width", width).attr("height", height);
+		for(var j = 0; j < dataT.length; j++){
+			if(weightedNodes.length == 0){
+				weightedNodes.push({source: dataT[j].source, target: dataT[j].target, weight: +0});
+			}
+
+			var index = 0;
+			var find = false;
+			while(index < weightedNodes.length && !find){
+				if(dataT[j].source == weightedNodes[index].source && dataT[j].target == weightedNodes[index].target ||
+					dataT[j].target == weightedNodes[index].source && dataT[j].source == weightedNodes[index].target){
+					find = true;
+				}
+				else{
+					index++;
+				}
+			}
+
+			if(!find){
+				weightedNodes.push({source: dataT[j].source, target: dataT[j].target, weight: +0});
+			}
+		}
+
+		for(var k = 0; k < weightedNodes.length; k++){
+			var time = [];
+			for(var j = 0; j < dataT.length; j++){
+				if(dataT[j].source == weightedNodes[k].source && dataT[j].target == weightedNodes[k].target ||
+					dataT[j].source == weightedNodes[k].target && dataT[j].target == weightedNodes[k].source){
+					time.push(parseDate(dataT[j].date));
+				}
+			}
+			time.sort(function(a,b){return a.getTime() - b.getTime()});
+			var weight = 0.5*time.length;
+			for(var i = 0; i < time.length -1; i++){
+				var days = (time[i+1].getTime() - time[i].getTime())/24/3600/1000;
+				if(days < 1){
+					weight = weight + 0.5;
+				}
+				else{
+					weight = weight + (0.5*(1/Math.round(days)));
+				}
+			}
+			weight = Math.round(weight*100)/100;
+			weightedNodes[k].weight = weight;
+		}
+
+
+
+
+
+		//Node and Edge
+
+		for(var r = 0; r < nodesForIndexTwo.length; r++){
+			nodes.push({id: nodesForIndexTwo[r]});
+		}
+
+		for(var i = 0; i < dataT.length; i++){
+			var index1 = nodesForIndexTwo.indexOf(dataT[i].source);
+			var index2 = nodesForIndexTwo.indexOf(dataT[i].target);
+			var temp;
+			for(var j = 0; j< weightedNodes.length; j++){
+				if(dataT[i].source == weightedNodes[j].source && dataT[i].target == weightedNodes[j].target ||
+					dataT[i].source == weightedNodes[j].target && dataT[i].target == weightedNodes[j].source){
+					temp = weightedNodes[j].weight
+				}
+			}
+			edges.push({source: index1, target: index2, date: parseDate(dataT[i].date), etype: dataT[i].etype, weight: temp});
+		}
+		console.log(dataT);
+		console.log(nodes);
+		//var color = d3.scaleOrdinal(d3.schemeSet3);
+		var radius = 10;
+		var padding = 30;
+		var force = d3.forceSimulation(nodes)
+						  .force("charge", d3.forceManyBody().strength(-80))
+						  .force("link", d3.forceLink(edges).distance(40))   
+						  .force("center", d3.forceCenter().x(155).y(170));
+
+		var edge = svg.selectAll("link")
+				.data(edges)
+				.enter()
+				.append("line")
+				.attr("id", function(d, i){return d.id;})
+				.attr('marker-end', 'url(#triangle)')
+				.style("stroke", function(d){return transfer(d.etype)})
+				.style("stroke-width", function(d){return d.weight*(1.2);})
+				.style("opacity", 0.5).style("fill", function(d){return transfer(d.etype)});
+		edge.append("title").text(function(d){})
+
+		var node = svg.selectAll("circle")
+				.data(nodes)
+				.enter()
+				.append("circle").attr("id", function(d){return d.id})
+				.attr("r", 10)
+				.attr("fill", 'black')
+				.style("fill", function(d, i) {
+					return getColor(d.id, uniqueNodesWithColor);
+				}).style("stroke", 'black').style('stroke-width' ,2.5).call(d3.drag()
+					.on("start", dragStartedT)
+					.on("drag", draggingT)
+					.on("end", dragEndedT)).on("click", function(d){
+						//Line Chart
+						//Line Chart
+						//Line Chart
+						//Line Chart
+						d3.select("#linechart2").select("svg").remove();
+						var id = d3.select(this).attr("id");
+						d3.select(this).attr("r", 15);
+						d3.select(this).transition().duration(1000).attr("r", 10);
+						var time;
+						var seller;
+						for(var i = 0; i < arrayAndtime.length; i++){
+							if(arrayAndtime[i].id == value){
+								time = arrayAndtime[i].time;
+								seller = arrayAndtime[i].seller;
+							}
+						}
+						var width = 500, height = 350;
+						var margin = {top: 20, bottom: 30, left: 20, right: 20};
+						var innerwidth = width - margin.left - margin.right;
+						var innerheight = height - margin.top - margin.bottom;
+						var svg = d3.select("#linechart2").append("svg").attr("width", width).attr("height", height);
+						var temp = new Date(2015, 4, 11, 14, 0, 0);
+						var date = new Date(temp.getTime() + time*1000);
+						var datas = [];
+						for(var i = 0; i < dataT.length; i++){
+							if(dataT[i].source == id || dataT[i].target == id){
+								datas.push({source: dataT[i].source, target: dataT[i].target, etype: dataT[i].etype, date: parseDate(dataT[i].date)});
+							}
+						}
+						var source;
+						if(datas[0].source == id){
+							source = datas[0].target;
+						}
+						else{
+							source = datas[0].source;
+						}
+
+						var indexT = 0;
+						var findTT =0;
+						while(!findTT && indexT < arrayAndtime.length){
+							if(id == arrayAndtime[indexT].seller){
+								findTT = true;
+							}
+							else{
+								indexT++;
+							}
+						}
+
+						if(!findTT){
+							datas.push({source: source, target: seller, date: date , etype: "2"});
+						}
+						
+
+						var dataForNodes = [];
+						var dataForLines = [];
+
+						for(var i = 0; i < datas.length; i++){
+							dataForNodes.push({id: datas[i].source, etype: datas[i].etype, date: datas[i].date});
+							dataForNodes.push({id: datas[i].target, etype: datas[i].etype, date: datas[i].date});
+							dataForLines.push({id: i, value: [{id: datas[i].source, date: datas[i].date}, {
+								id: datas[i].target, date: datas[i].date}], etype: datas[i].etype});
+						}
+
+						console.log(dataForNodes);
+						console.log(dataForLines);
+					
+						var xScale = d3.scaleTime().range([padding, innerwidth - padding]);
+						var yScale = d3.scaleBand().rangeRound([innerheight - padding, padding]);
+						var colorS = d3.scaleOrdinal().range(["red", "blue", "black", "green"]);
+						var xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat("%m/%d/%y")).ticks(3);
+						var yAxis = d3.axisLeft(yScale);
+						var line = d3.line().x(function(d){return xScale(d.date);}).y(function(d){return yScale(d.id) + yScale.bandwidth()/2});
+
+						svg.append("defs").append("clipPath").attr("id", "clip").append("rect").attr("width", innerwidth).attr("height", innerheight);
+
+						const container = svg.append('g').attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+						//Get MaxDate & MinDate
+
+						var maxDate = datas[0].date;
+						var minDate = datas[0].date;
+						for(var i = 1; i < datas.length; i++){
+							if(maxDate < datas[i].date){
+								maxDate = datas[i].date;
+							}
+
+							if(minDate > datas[i].date){
+								minDate = datas[i].date;
+							}
+						}
+
+						xScale.domain(d3.extent(datas, function(d){return d.date;})).nice();
+						yScale.domain(dataForNodes.map(function(d){return d.id}));
+
+						var dotContainer = container.append("g").attr("clip-path", "url(#clip)");
+
+						dotContainer.selectAll("circle").data(dataForNodes).enter().append("circle").attr('class', 'dot').attr("id", function(d){return d.id + "-" + d.date + "-" + d.etype;}).attr("r",7.5).style("opacity", .5).attr("cx", function(d) { return xScale(d.date);}).attr("cy", function(d){return (yScale(d.id) + yScale.bandwidth()/2);}).style("fill", function(d){return getColor(d.id, uniqueNodesWithColor);}).on("mouseover", mouseover).on("mouseout", mouseout);
+						
+						// Etype 0 didnt show up
+						var lineContainer = container.selectAll("path").data(dataForLines).enter().append("g");
+    					lineContainer.append("path").attr("class","line").attr("d", function(d) { return line(d.value); }).style("stroke", function(d) {return transfer(parseInt(d.etype));}).style("stroke-width", function(d){
+    						if(d.etype === "2"){
+    							return 5;
+    						}
+    						else{
+    							return 3;
+    						}
+    					}).attr("clip-path", "url(#clip)");
+
+    					container.append("g").attr("class", "axis axis--x").attr("transform", "translate(0," + (innerheight - padding) + ")").call(xAxis);
+  						container.append("g").attr("class", "axis axis--y").attr("transform", "translate(" + padding + ",0)").call(yAxis);
+					});
+		function mouseover(){
+			d3.select(this).transition().duration(750).attr("r", 16);
+			var id = d3.select(this).attr("id");
+			var info = id.split("-");
+			var name = info[0];
+			var date = info[1].split(" ");
+			var type = info[3];
+			div2.transition().duration(200).style("opacity", .9);
+       		div2.html("ID: " + name + "<br/>" + date[0] + " " + date[1] + " " + date[2] + " " + date[3] + " " + date[4] +  "<br/>" +  "type: " + transferTwo(type)).style("left", (d3.event.pageX) + "px").style("top", (d3.event.pageY - 18) + "px");
+		}
+
+		function mouseout(){
+			d3.select(this).transition().duration(750).attr("r", 7.5);
+			div2.transition().duration(500).style("opacity", 0);	
+		}
+		
+		var nodeSubarea = svg.selectAll(".nodelabel").data(nodes).enter().append("text").attr('id', function(d){return d.id;}).attr("x", function(d){return d.x;}).attr("y", function(d){return d.y;}).attr("class", 'nodelabel').attr("stroke", 'black').text(function(d){return d.id;}).attr("font-size", 8);
+
+		var edgeSubarea= svg.selectAll("path").data(edges).enter().append('path').attr('d', function(d){return 'M ' +d.source.x + ' ' + d.source.y + ' L '+ d.target.x + ' ' + d.target.y}).attr("class", 'edgepath').attr('fill-opacity', 0).attr('stroke-opacity', 0).attr('fill',function(d){return transferTwo(d.etype)}).attr('stroke', 'black').attr('id', function(d){return 'edgepath' + d.source + d.target + d.etype});
+
+		force.on("tick", function() {
+
+			edge.attr("x1", function(d) { return d.source.x; })
+				.attr("y1", function(d) { return d.source.y; })
+				.attr("x2", function(d) { return d.target.x; })
+				.attr("y2", function(d) { return d.target.y; });
+			
+			node.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(490 - radius, d.x)); })
+					 .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(450 - radius, d.y)); });
+
+			nodeSubarea.attr("x", function(d) { return d.x; }) 
+                  		  .attr("y", function(d) { return d.y; });
+
+            edgeSubarea.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y; return path}); 
+		});
+
+    	function dragStartedT(d) {
+			if (!d3.event.active) force.alphaTarget(0.3).restart();
+				d.fx = d.x;
+				d.fy = d.y;
+		}
+
+		function draggingT(d) {
+			d.fx = d3.event.x;
+			d.fy = d3.event.y;
+		}
+
+		function dragEndedT(d) {
+			if (!d3.event.active) force.alphaTarget(0);
+				d.fx = null;
+		}
+	});
+
+});	
+		//Zoomed Line Chart
+    	//Context --> Link & Node
+  		var contextlineGroups = context.selectAll("path").data(links).enter().append("g");
+  		var contextLines = contextlineGroups.append("path")
+        		.attr("class", "line")
+        		.attr("d", function(d) { return line2(d.value); })
+        		.attr("id", function(d){ return d.connection;})
+        		.style("stroke", function(d) {
+    			var finalColor = "#ffffff";
+    			if(d.etype == 2){
+    				finalColor = transfer(d.etype);
+    				
+    			}
+    			else{
+    				var color = getColor(d.connection, uniqueNodesWithColor);
+    				
+
+    				if(color == "#f2f2f2"){
+						finalColor = "#f2f2f2";
+    				}
+    				else{
+    					finalColor = transfer(d.etype);
+    				}
+    			}
+
+    			return finalColor;;})
+        		.attr("clip-path", "url(#clip)");
+        var dotsContext = context.append("g");
+        	dotsContext.attr("clip-path", "url(#clip)");
+        	dotsContext.selectAll("circle").data(nodes).enter().append("circle").attr('class', 'dot').attr("r",3.5).style("opacity", .5).attr("cx", function(d) { return xScale2(d.date); }).attr("cy", function(d){return (yScale2(d.id) + yScale2.bandwidth()/2);}).style("fill", function(d){
+    				if(d.etype ==2){
+    					return getColor(d.id, uniqueNodesWithColor);
+    				}
+
+    				var find = false;
+    				var index = 0;
+    				while(!find && index < dateWithSequenceCommunication.length){
+    					if(d.date === dateWithSequenceCommunication[index]){
+    						find = true;
+    					}
+    					else{
+    						index++;
+    					}
+    				}
+
+    				if(find){
+    					return getColor(d.id, uniqueNodesWithColor);
+    				}
+    				else{
+    					return "#f2f2f2";
+    				}
+
+    				});
+
+  		//x-Axis, y-Axis 
+  		focus.append("g").attr("class", "axis axis--x").attr("transform", "translate(0," + (innerheight - padding) + ")").call(xAxis);
+  		focus.append("g").attr("class", "axis axis--y").attr("transform", "translate(" + padding + ",0)").call(yAxis);
+
+  		context.append("g").attr("class", "axis axis--x").attr("transform", "translate(0," + (innerheight2 - padding) + ")").call(xAxis2);
+  		context.append("g").attr("class", "brush").call(brush).call(brush.move, xScale.range()); 
+
+  		// x-Label, y-Label
+  		focus.append("text").attr("transform", "rotate(-90)").attr("y", 0 - margin.left).attr("x", 0 - (innerheight/2)).attr("dy", "1em").style("text-anchor", "middle").text("Employee - ID");	
+  		context.append("text").attr("transform", "translate(" + (innerwidth)/2 + "," + (height - margin2.top - 10) + ")").style("text-anchor", "middle").text("Date");
+
+  		
+  		var legendName = ["call", "email", "purchase", "meeting"];
+  		var legendColor = d3.scaleOrdinal().domain(legendName).range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]);
+  		var legends = svg.append("g").attr("transform", "translate(930, 50)").selectAll(".legends").data(legendName);
+		var legend = legends.enter().append("g").classed("legends", true).attr("transform", function(d, i){
+			return "translate(0, " + (i+1)*15 + ")"
+		});
+		legend.append("rect").attr("width", 20).attr("height", 4).attr("fill", function(d, i){return legendColor(d);});
+		legend.append("text").attr("font-size", "10px").text(function(d){return d;}).attr("fill", function(d, i){return legendColor(d);}).attr("x", 25).attr("y", 3);	
+	});
+	function brushed() {
+  		var selection = d3.event.selection;
+  		xScale.domain(selection.map(xScale2.invert, xScale2));
+  		focus.selectAll("path.line").attr("d", function(d){return line(d.value)});
+  		focus.selectAll("circle").attr("cx", function(d){return xScale(d.date)}).attr("cy", function(d){return yScale(d.id) + yScale.bandwidth()/2});
+  		focus.select(".axis--x").call(xAxis);
+	}
+
+	function mouseover(){
+		d3.select(this).transition().duration(750).attr("r", 16);
+		var id = d3.select(this).attr("id");
+		var info = id.split("-");
+		var name = info[0];
+		var date = info[1].split(" ");
+		var type = info[3];
+		div.transition().duration(200).style("opacity", .9);
+      	div.html("ID: " + name + "<br/>" + date[0] + " " + date[1] + " " + date[2] + " " + date[3] + " " + date[4] +  "<br/>" +  "type: " + transferTwo(type)).style("left", (d3.event.pageX) + "px").style("top", (d3.event.pageY - 28) + "px");
+	}
+
+	function mouseout(){
+		d3.select(this).transition().duration(750).attr("r", 7.5);
+		div.transition().duration(500).style("opacity", 0);	
+	}
+}
+
+function getColor(id, array){
+		var find = false;
+		var index = 0;
+		var color = "#f2f2f2";
+		while(!find && index < array.length){
+			if(array[index].id == id){
+				find = true;
+				color = array[index].color;
+			}
+			else{
+				index++;
+			}
+		}
+
+		return color;
+}
+
+function getLineColor(id, array){
+	var find = false;
+		var index = 0;
+		var color = "#f2f2f2";
+		while(!find && index < array.length){
+			if(array[index].id == id){
+				find = true;
+				color = array[index].color;
+			}
+			else{
+				index++;
+			}
+		}
+	if(color == "#f2f2f2"){
+
+	}
+	else{
+
+	}
+}
+
+function transfer(d){
+		if(d == 0){
+			return "#1f77b4";
+		}
+		else if(d == 1){
+			return "#ff7f0e";
+		}
+		else if(d == 2){
+			return "#2ca02c";
+		}
+		else if(d == 3){
+			return "#d62728";
+		}
+}
+
+function transferTwo(d){
+		if(d == 0){
+			return "call";
+		}
+		else if(d == 1){
+			return "email";
+		}
+		else if(d == 2){
+			return "purchase";
+		}
+		else if(d == 3){
+			return "meeting";
+		}
+}
+
+
+
+//Reset Function for networkGraph
+function resetForNetworkGraph(){ 
+	d3.select("#linechart").select("svg").remove();
+	document.getElementById("0").checked = false;
+	document.getElementById("1").checked = false;
+	document.getElementById("2").checked = false;
+	document.getElementById("3").checked = false;
+	document.getElementById("allType").checked = false;
+	document.getElementById("allDate").checked = false;
+}
+
+
+
+var div2 = d3.select("#area2").append("div").attr("class", "tooltip").style("opacity", 0);
+//Network Graph 
+function ForNetworkGraph(){
+	var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
+	var width = 420, height = 500;
+	var svg = d3.select("#networkGraph").append("svg").attr("width", width).attr("height", height);
+	var nodes = [];
+	var edges = [];
+	var nodesForIndex = [];
+	var weight = [];
+	var fileName = "TwoMonthCommunication/" + value + "TwoMonthCommunication.csv";
+	var parseTime = d3.timeParse("%Y-%m-%d");
+	var startDate = parseTime(document.getElementById('startDate').value);
+	var endDate = parseTime(document.getElementById('endDate').value);
+	var allDate = document.getElementById("allDate");
+	var allType = document.getElementById("allType");
+	var typeValue = [];
+	var selectType = document.getElementsByName("selectType");
+	for(var i = 0; i < selectType.length; i++){
+		if(selectType[i].checked){
+			typeValue.push(selectType[i].value);
+		}
+	}
+	d3.csv(fileName).then(function(data){
+
+		var d = [];
+		if(allDate.checked && allType.checked){
+			for(var a = 0; a < data.length; a++){
+				d.push({source: data[a].source, target: data[a].target, etype: data[a].etype, date: data[a].date})
+			}
+		}
+
+		if(allDate.checked && !allType.checked){
+			for(var a  = 0; a < data.length; a++){
+				var index = 0;
+				var find = false;
+				while(index < typeValue.length && !find){
+					if(data[a].etype == typeValue[index]){
+						find = true;
+						d.push({source: data[a].source, target: data[a].target, etype: data[a].etype, date: data[a].date})
+					}
+					else{
+						index++;
+					}
+				}
+			}
+		}
+
+		if(!allDate.checked && allType.checked){
+			for(var a = 0; a < data.length; a++){
+				if(startDate <= parseDate(data[a].date) && endDate >= parseDate(data[a].date)){
+					d.push({source: data[a].source, target: data[a].target, etype: data[a].etype, date: data[a].date})
+				}
+			}
+		}
+
+		if(!allDate.checked && !allType.checked){
+			for(var a = 0; a < data.length; a++){
+				if(startDate <= parseDate(data[a].date) && endDate >= parseDate(data[a].date)){
+					var index = 0;
+					var find = false;
+					while(index < typeValue.length && !find){
+						if(data[a].etype == typeValue[index]){
+							find = true;
+							d.push({source: data[a].source, target: data[a].target, etype: data[a].etype, date: data[a].date})
+						}
+						else{
+							index++;
+						}
+					}
+				}
+			}
+		}
+		var dataT = d;
+
+		//Caculate Weight
+		var weightedNodes = [];
+		for(var j = 0; j < dataT.length; j++){
+			if(weightedNodes.length == 0){
+				weightedNodes.push({source: dataT[j].source, target: dataT[j].target, weight: +0});
+			}
+
+			var index = 0;
+			var find = false;
+			while(index < weightedNodes.length && !find){
+				if(dataT[j].source == weightedNodes[index].source && dataT[j].target == weightedNodes[index].target ||
+					dataT[j].target == weightedNodes[index].source && dataT[j].source == weightedNodes[index].target){
+					find = true;
+				}
+				else{
+					index++;
+				}
+			}
+
+			if(!find){
+				weightedNodes.push({source: dataT[j].source, target: dataT[j].target, weight: +0});
+			}
+		}
+
+		for(var k = 0; k < weightedNodes.length; k++){
+			var time = [];
+			for(var j = 0; j < dataT.length; j++){
+				if(dataT[j].source == weightedNodes[k].source && dataT[j].target == weightedNodes[k].target ||
+					dataT[j].source == weightedNodes[k].target && dataT[j].target == weightedNodes[k].source){
+					time.push(parseDate(dataT[j].date));
+				}
+			}
+			time.sort(function(a,b){return a.getTime() - b.getTime()});
+			var weight = 0.5*time.length;
+			for(var i = 0; i < time.length -1; i++){
+				var days = (time[i+1].getTime() - time[i].getTime())/24/3600/1000;
+				if(days < 1){
+					weight = weight + 0.5;
+				}
+				else{
+					weight = weight + (0.5*(1/Math.round(days)));
+				}
+			}
+			weight = Math.round(weight*100)/100;
+			weightedNodes[k].weight = weight;
+		}
+
+		if(nodesForIndex.length == 0){
+			nodesForIndex.push(dataT[0].source);
+			nodesForIndex.push(dataT[0].target);
+		}
+		
+		for(var i = 1; i < dataT.length; i++){
+			var index = 0;
+			var find = false;
+			while(!find && index < nodesForIndex.length){
+				if(nodesForIndex[index] == dataT[i].source){
+					find = true;
+				}
+				else{
+					index++;
+				}
+			}
+
+			if(!find){
+				nodesForIndex.push(dataT[i].source);
+			}
+
+
+			var index2 = 0;
+			var find2 = 0;
+			while(!find2 && index2 < nodesForIndex.length){
+				if(nodesForIndex[index2] == dataT[i].target){
+					find2 = true;
+				}
+				else{
+					index2++;
+				}
+			}
+
+			if(!find2){
+				nodesForIndex.push(dataT[i].target);
+			}
+		}
+
+
+		var uniqueNodes = nodesForIndex;
+		//Using unique nodes to find sequence communication.
+		//console.log(uniqueNodes);
+		var countCommunicationTimesOfEachNode = [];
+		for(w = 0; w < uniqueNodes.length; w++){
+			countCommunicationTimesOfEachNode[w] = 0;
+		}
+		//console.log(countCommunicationTimesOfEachNode);
+
+		for(q = 0; q < data.length; q++){
+
+			var indexOne = uniqueNodes.indexOf(data[q].source);
+			var indexTwo = uniqueNodes.indexOf(data[q].target);
+
+			countCommunicationTimesOfEachNode[indexOne] = countCommunicationTimesOfEachNode[indexOne] + 1;
+			countCommunicationTimesOfEachNode[indexTwo] = countCommunicationTimesOfEachNode[indexTwo] + 1;
+		}
+
+
+		var uniqueNodesWithColor = [];
+		var indexColor = 0;
+		for(e = 0; e < uniqueNodes.length; e++){
+			if(countCommunicationTimesOfEachNode[e] >= 2){
+				uniqueNodesWithColor.push({id: uniqueNodes[e], color: colors[indexColor]});
+				indexColor++;
+			}
+			else{
+				uniqueNodesWithColor.push({id: uniqueNodes[e], color: "#808080"});
+			}
+		}
+
+		for (var i = 0; i < uniqueNodes.length; i++){
+			for(var j = 0; j < dataT.length; j++){
+				if(dataT[j].source === uniqueNodes[i] || dataT[j].target === uniqueNodes[i]){
+					if(uniqueNodesWithColor[i].color === "#808080"){
+						dataT.splice(j, 1);
+					}
+				}
+			}
+		}
+
+		var nodesForIndexTwo = [];
+
+
+		if(nodesForIndexTwo.length == 0){
+			nodesForIndexTwo.push(dataT[0].source);
+			nodesForIndexTwo.push(dataT[0].target);
+		}
+		
+		for(var i = 1; i < dataT.length; i++){
+			var index = 0;
+			var find = false;
+			while(!find && index < nodesForIndexTwo.length){
+				if(nodesForIndexTwo[index] == dataT[i].source){
+					find = true;
+				}
+				else{
+					index++;
+				}
+			}
+
+			if(!find){
+				nodesForIndexTwo.push(dataT[i].source);
+			}
+
+
+			var index2 = 0;
+			var find2 = 0;
+			while(!find2 && index2 < nodesForIndexTwo.length){
+				if(nodesForIndexTwo[index2] == dataT[i].target){
+					find2 = true;
+				}
+				else{
+					index2++;
+				}
+			}
+
+			if(!find2){
+				nodesForIndexTwo.push(dataT[i].target);
+			}
+		}
+
+
+
+
+
+//Node and Edge
+
+		for(var r = 0; r < nodesForIndexTwo.length; r++){
+			nodes.push({id: nodesForIndexTwo[r]});
+		}
+
+		for(var i = 0; i < dataT.length; i++){
+			var index1 = nodesForIndexTwo.indexOf(dataT[i].source);
+			var index2 = nodesForIndexTwo.indexOf(dataT[i].target);
+			var temp;
+			for(var j = 0; j< weightedNodes.length; j++){
+				if(dataT[i].source == weightedNodes[j].source && dataT[i].target == weightedNodes[j].target ||
+					dataT[i].source == weightedNodes[j].target && dataT[i].target == weightedNodes[j].source){
+					temp = weightedNodes[j].weight
+				}
+			}
+			edges.push({source: index1, target: index2, date: parseDate(dataT[i].date), etype: dataT[i].etype, weight: temp});
+		}
+
+
+		
+
+
+
+		
+		//var color = d3.scaleOrdinal(d3.schemeSet3);
+		var radius = 10;
+		var padding = 30;
+		var force = d3.forceSimulation(nodes)
+						  .force("charge", d3.forceManyBody().strength(-80))
+						  .force("link", d3.forceLink(edges).distance(40))   
+						  .force("center", d3.forceCenter().x(155).y(170));
+
+		var edge = svg.selectAll("link")
+				.data(edges)
+				.enter()
+				.append("line")
+				.attr("id", function(d, i){return d.id;})
+				.attr('marker-end', 'url(#triangle)')
+				.style("stroke", function(d){return transfer(d.etype)})
+				.style("stroke-width", function(d){return d.weight*(1.2);})
+				.style("opacity", 0.5).style("fill", function(d){return transfer(d.etype)});
+		edge.append("title").text(function(d){})
+
+		var node = svg.selectAll("circle")
+				.data(nodes)
+				.enter()
+				.append("circle").attr("id", function(d){return d.id})
+				.attr("r", 10)
+				.attr("fill", 'black')
+				.style("fill", function(d, i) {
+					return getColor(d.id, uniqueNodesWithColor);
+				}).style("stroke", 'black').style('stroke-width' ,2.5).call(d3.drag()
+					.on("start", dragStartedT)
+					.on("drag", draggingT)
+					.on("end", dragEndedT)).on("click", function(d){
+						//Line Chart
+						//Line Chart
+						//Line Chart
+						//Line Chart
+						d3.select("#linechart").select("svg").remove();
+						var id = d3.select(this).attr("id");
+						d3.select(this).attr("r", 15);
+						d3.select(this).transition().duration(1000).attr("r", 10);
+						var time;
+						var seller;
+						for(var i = 0; i < arrayAndtime.length; i++){
+							if(arrayAndtime[i].id == value){
+								time = arrayAndtime[i].time;
+								seller = arrayAndtime[i].seller;
+							}
+						}
+						var width = 400, height = 350;
+						var margin = {top: 20, bottom: 30, left: 20, right: 20};
+						var innerwidth = width - margin.left - margin.right;
+						var innerheight = height - margin.top - margin.bottom;
+						var svg = d3.select("#linechart").append("svg").attr("width", width).attr("height", height);
+						var temp = new Date(2015, 4, 11, 14, 0, 0);
+						var date = new Date(temp.getTime() + time*1000);
+						var datas = [];
+						for(var i = 0; i < dataT.length; i++){
+							if(dataT[i].source == id || dataT[i].target == id){
+								datas.push({source: dataT[i].source, target: dataT[i].target, etype: dataT[i].etype, date: parseDate(dataT[i].date)});
+							}
+						}
+						var source;
+						if(datas[0].source == id){
+							source = datas[0].target;
+						}
+						else{
+							source = datas[0].source;
+						}
+
+						var indexT = 0;
+						var findTT =0;
+						while(!findTT && indexT < arrayAndtime.length){
+							if(id == arrayAndtime[indexT].seller){
+								findTT = true;
+							}
+							else{
+								indexT++;
+							}
+						}
+
+						if(!findTT){
+							datas.push({source: source, target: seller, date: date , etype: "2"});
+						}
+						
+
+						var dataForNodes = [];
+						var dataForLines = [];
+
+						for(var i = 0; i < datas.length; i++){
+							dataForNodes.push({id: datas[i].source, etype: datas[i].etype, date: datas[i].date});
+							dataForNodes.push({id: datas[i].target, etype: datas[i].etype, date: datas[i].date});
+							dataForLines.push({id: i, value: [{id: datas[i].source, date: datas[i].date}, {
+								id: datas[i].target, date: datas[i].date}], etype: datas[i].etype});
+						}
+					
+						var xScale = d3.scaleTime().range([padding, innerwidth - padding]);
+						var yScale = d3.scaleBand().rangeRound([innerheight - padding, padding]);
+						var colorS = d3.scaleOrdinal().range(["red", "blue", "black", "green"]);
+						var xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat("%m/%d/%y")).ticks(3);
+						var yAxis = d3.axisLeft(yScale);
+						var line = d3.line().x(function(d){return xScale(d.date);}).y(function(d){return yScale(d.id) + yScale.bandwidth()/2});
+
+						svg.append("defs").append("clipPath").attr("id", "clip").append("rect").attr("width", innerwidth).attr("height", innerheight);
+
+						const container = svg.append('g').attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+						//Get MaxDate & MinDate
+
+						var maxDate = datas[0].date;
+						var minDate = datas[0].date;
+						for(var i = 1; i < datas.length; i++){
+							if(maxDate < datas[i].date){
+								maxDate = datas[i].date;
+							}
+
+							if(minDate > datas[i].date){
+								minDate = datas[i].date;
+							}
+						}
+
+						xScale.domain(d3.extent(datas, function(d){return d.date;})).nice();
+						yScale.domain(dataForNodes.map(function(d){return d.id}));
+
+						var dotContainer = container.append("g").attr("clip-path", "url(#clip)");
+
+						dotContainer.selectAll("circle").data(dataForNodes).enter().append("circle").attr('class', 'dot').attr("id", function(d){return d.id + "-" + d.date + "-" + d.etype;}).attr("r",7.5).style("opacity", .5).attr("cx", function(d) { return xScale(d.date);}).attr("cy", function(d){return (yScale(d.id) + yScale.bandwidth()/2);}).style("fill", function(d){return getColor(d.id, uniqueNodesWithColor);}).on("mouseover", mouseover).on("mouseout", mouseout);
+						
+						// Etype 0 didnt show up
+						var lineContainer = container.selectAll("path").data(dataForLines).enter().append("g");
+    					lineContainer.append("path").attr("class","line").attr("d", function(d) { return line(d.value); }).style("stroke", function(d) {return transfer(parseInt(d.etype));}).style("stroke-width", function(d){
+    						if(d.etype === "2"){
+    							return 5;
+    						}
+    						else{
+    							return 3;
+    						}
+    					}).attr("clip-path", "url(#clip)");
+
+    					container.append("g").attr("class", "axis axis--x").attr("transform", "translate(0," + (innerheight - padding) + ")").call(xAxis);
+  						container.append("g").attr("class", "axis axis--y").attr("transform", "translate(" + padding + ",0)").call(yAxis);
+					});
+		
+
+		function mouseover(){
+			d3.select(this).transition().duration(750).attr("r", 16);
+			var id = d3.select(this).attr("id");
+			var info = id.split("-");
+			var name = info[0];
+			var date = info[1].split(" ");
+			var type = info[3];
+			div2.transition().duration(200).style("opacity", .9);
+       		div2.html("ID: " + name + "<br/>" + date[0] + " " + date[1] + " " + date[2] + " " + date[3] + " " + date[4] +  "<br/>" +  "type: " + transferTwo(type)).style("left", (d3.event.pageX) + "px").style("top", (d3.event.pageY - 18) + "px");
+		}
+
+		function mouseout(){
+			d3.select(this).transition().duration(750).attr("r", 7.5);
+			div2.transition().duration(500).style("opacity", 0);	
+		}
+		
+		var nodeSubarea = svg.selectAll(".nodelabel").data(nodes).enter().append("text").attr('id', function(d){return d.id;}).attr("x", function(d){return d.x;}).attr("y", function(d){return d.y;}).attr("class", 'nodelabel').attr("stroke", 'black').text(function(d){return d.id;}).attr("font-size", 8);
+
+		var edgeSubarea= svg.selectAll("path").data(edges).enter().append('path').attr('d', function(d){return 'M ' +d.source.x + ' ' + d.source.y + ' L '+ d.target.x + ' ' + d.target.y}).attr("class", 'edgepath').attr('fill-opacity', 0).attr('stroke-opacity', 0).attr('fill',function(d){return transferTwo(d.etype)}).attr('stroke', 'black').attr('id', function(d){return 'edgepath' + d.source + d.target + d.etype});
+
+		force.on("tick", function() {
+
+			edge.attr("x1", function(d) { return d.source.x; })
+				.attr("y1", function(d) { return d.source.y; })
+				.attr("x2", function(d) { return d.target.x; })
+				.attr("y2", function(d) { return d.target.y; });
+			
+			node.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(490 - radius, d.x)); })
+					 .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(450 - radius, d.y)); });
+
+			nodeSubarea.attr("x", function(d) { return d.x; }) 
+                  		  .attr("y", function(d) { return d.y; });
+
+            edgeSubarea.attr('d', function(d) { var path='M '+d.source.x+' '+d.source.y+' L '+ d.target.x +' '+d.target.y; return path}); 
+		});
+
+    	function dragStartedT(d) {
+			if (!d3.event.active) force.alphaTarget(0.3).restart();
+				d.fx = d.x;
+				d.fy = d.y;
+		}
+
+		function draggingT(d) {
+			d.fx = d3.event.x;
+			d.fy = d3.event.y;
+		}
+
+		function dragEndedT(d) {
+			if (!d3.event.active) force.alphaTarget(0);
+				d.fx = null;
+		}
+	})	
+}
+
+
+
+
+
+
+
+</script>
+</body>
